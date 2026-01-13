@@ -6,166 +6,137 @@
 <title>Inspeção de Manutenção – Quartos</title>
 
 <style>
-body { font-family: Arial, sans-serif; background:#f4f4f4; padding:15px; }
-h1,h2 { margin-top:0; }
-.section { background:#fff; padding:12px; margin-bottom:15px; border-radius:6px; }
-.item { margin-bottom:12px; }
-.obs { display:none; width:100%; margin-top:6px; }
-button { width:100%; padding:12px; font-size:16px; background:#0078d4; color:#fff; border:none; border-radius:6px; }
-.hidden { display:none; }
+body {
+  font-family: Arial, sans-serif;
+  background:#f4f4f4;
+  padding:15px;
+}
+h1 { font-size:22px; }
+.section {
+  background:#fff;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:6px;
+}
+.item { margin-bottom:14px; }
+label { font-weight:bold; display:block; }
+.obs {
+  display:none;
+  width:100%;
+  margin-top:6px;
+}
+button {
+  background:#0078d4;
+  color:#fff;
+  padding:14px;
+  width:100%;
+  border:none;
+  border-radius:6px;
+  font-size:16px;
+}
 </style>
 
 <script>
-/* LOGIN */
-function login() {
-  if (user.value==="pedro" && pass.value==="mnt") {
-    loginBox.style.display="none";
-    formBox.style.display="block";
-  } else alert("Credenciais inválidas.");
+function toggleObs(id, nok) {
+  const obs = document.getElementById(id + "_obs");
+  obs.style.display = nok ? "block" : "none";
 }
 
-/* DATA AUTOMÁTICA */
-window.onload = () => {
-  const d=new Date();
-  data.value = d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-}
+function prepararEnvio() {
+  const quarto = document.getElementById("quarto").value.trim();
+  if (!quarto) {
+    alert("Indique o número do quarto.");
+    document.getElementById("quarto").focus();
+    return false;
+  }
 
-/* OBS NOK */
-function toggleObs(id,nok){document.getElementById(id+"_obs").style.display=nok?"block":"none";}
-
-/* SUBMISSÃO */
-function prepararEnvio(){
-  let txt = "";
+  const hoje = new Date().toLocaleDateString("pt-PT");
+  let mensagem = `Data: ${hoje}\nQuarto: ${quarto}\n\n`;
   let temNOK = false;
 
-  const itens = document.querySelectorAll(".item");
-
-  for (const i of itens) {
-    const ok = i.querySelector("input[type=radio]:first-child");
-    const nok = i.querySelector(".nok");
-    const obs = i.querySelector("textarea");
+  document.querySelectorAll(".item").forEach(item => {
+    const ok = item.querySelector(".ok");
+    const nok = item.querySelector(".nok");
+    const obs = item.querySelector("textarea");
 
     if (!ok.checked && !nok.checked) {
       alert("Todos os itens devem ser marcados como OK ou NOK.");
+      item.scrollIntoView({ behavior:"smooth", block:"center" });
       return false;
     }
 
     if (nok.checked) {
-      if (obs.value.trim() === "") {
-  alert("Observação obrigatória nos itens NOK.");
-
-  obs.style.display = "block"; // garante que está visível
-  obs.scrollIntoView({ behavior: "smooth", block: "center" });
-  setTimeout(() => obs.focus(), 300); // essencial no iPad
-
-  return false;
+      if (!obs.value.trim()) {
+        alert("Observação obrigatória nos itens NOK.");
+        obs.style.display="block";
+        obs.scrollIntoView({ behavior:"smooth", block:"center" });
+        setTimeout(()=>obs.focus(),300);
+        throw "Erro";
       }
       temNOK = true;
-      txt += "- " + nok.dataset.desc + "\n  Obs: " + obs.value + "\n\n";
+      mensagem += `NOK: ${nok.dataset.desc}\n`;
+      mensagem += `Obs.: ${obs.value}\n\n`;
     }
-  }
+  });
 
   if (!temNOK) {
     alert("Inspeção sem anomalias. Nada a enviar.");
     return false;
   }
 
-  mensagem.value =
-    "Data: " + data.value +
-    "\nQuarto: " + quarto.value +
-    "\n\nNOK:\n" + txt;
-
-  return true; // ✅ só aqui é que deixa enviar
+  document.getElementById("finalMessage").value = mensagem;
+  return true;
 }
 </script>
 </head>
 
 <body>
 
-<div id="loginBox" class="section">
-<h2>Acesso</h2>
-<input id="user" placeholder="Utilizador"><br><br>
-<input id="pass" type="password" placeholder="Password"><br><br>
-<button onclick="login()">Entrar</button>
-</div>
-
-<div id="formBox" class="hidden">
 <h1>Inspeção de Manutenção – Quartos</h1>
 
-<form action="https://api.web3forms.com/submit" method="POST" onsubmit="prepararEnvio()">
-<input type="hidden" name="access_key" value="6ccbebc1-4c92-4054-b56e-cc65b49ed8ec">
-<input type="hidden" name="message" id="mensagem">
-<input type="hidden" id="data">
+<form action="https://api.web3forms.com/submit" method="POST" onsubmit="return prepararEnvio()">
+
+<input type="hidden" name="access_key" value="COLOCA_AQUI_A_TUA_ACCESS_KEY">
+<input type="hidden" name="subject" value="INSPECAO_DIARIA">
+<input type="hidden" name="message" id="finalMessage">
 
 <div class="section">
-<label>Quarto nº</label><br>
-<input type="number" id="quarto" required style="width:100%">
+<label>Quarto nº</label>
+<input type="number" id="quarto" style="width:100%;padding:8px;">
 </div>
 
-<script>
-const checklist = {
-"Portas e Acessos":[
-"Portas abrem/fecham corretamente e sem ruídos",
-"Bateria da fechadura eletrónica",
-"Leitor de cartões funcional",
-"Molas hidráulicas bem afinadas (sem bater a porta)",
-"Fecho/tranca porta principal funcional",
-"Batentes/limitadores e dobradiças sem folgas"
-],
-"Eletricidade":[
-"Iluminação geral","Candeeiros","Interruptores","Tomadas","Tomadas USB",
-"Estado dos cabos e arrumados (com abraçadeira)",
-"Quadros / tampas elétricas bem fixas e fechados",
-"Sensores de movimento dos roupeiros"
-],
-"Climatização":[
-"Ar condicionado funcional e sem ruídos de ventilação",
-"Grelhas de ar desobstruídas / limpas",
-"Extração do WC funcional e sem barulho"
-],
-"WC":[
-"Sanita desentupida","Autoclismo funcional sem fugas",
-"Duche com pressão adequada","Estado do duche de mão",
-"Misturadoras funcionais e sem folgas","Todos os ralos com escoamento normal",
-"Tampa sanita","Iluminação do espelho de proximidade",
-"Massa de juntas (falta de massa)"
-],
-"Equipamentos":[
-"TV + Coluna WC","Comando TV funcional","Telefone",
-"Cofre funcional","Mini-bar funcional","Wi-Fi"
-],
-"Estrutura / Acabamentos":[
-"Indícios de humidade","Suportes de amenities",
-"Suportes (toalhas, cabides, etc.)","Pintura geral",
-"Papel de parede","Cabeceira de cama",
-"Cadeiras / Cadeirões","Abat-jours","Janelas",
-"Silicones gerais","Mobiliário","Autocolantes WC + Interruptores"
-],
-"Segurança":[
-"Detetor de fumo funcional","Planta de emergência bem afixada"
-]
-};
+<!-- EXEMPLO DE ITEM -->
+<div class="section">
+<h2>Portas e Acessos</h2>
 
-let id=1;
-for (const sec in checklist){
-  document.write('<div class="section"><h2>'+sec+'</h2>');
-  checklist[sec].forEach(t=>{
-    document.write(`
-    <div class="item">
-      <label>${t}</label><br>
-      <input type="radio" name="i${id}" onclick="toggleObs('i${id}',false)"> OK
-      <input type="radio" name="i${id}" class="nok" data-desc="${t}" onclick="toggleObs('i${id}',true)"> NOK
-      <textarea id="i${id}_obs" class="obs" placeholder="Observações"></textarea>
-    </div>`);
-    id++;
-  });
-  document.write('</div>');
-}
-</script>
+<div class="item">
+<label>Portas abrem/fecham corretamente e sem ruídos</label>
+<input type="radio" class="ok" onclick="toggleObs('i1',false)"> OK
+<input type="radio" class="nok" data-desc="Portas abrem/fecham corretamente e sem ruídos" onclick="toggleObs('i1',true)"> NOK
+<textarea id="i1_obs" class="obs" placeholder="Observações"></textarea>
+</div>
+
+<div class="item">
+<label>Bateria da fechadura eletrónica</label>
+<input type="radio" class="ok" onclick="toggleObs('i2',false)"> OK
+<input type="radio" class="nok" data-desc="Bateria da fechadura eletrónica" onclick="toggleObs('i2',true)"> NOK
+<textarea id="i2_obs" class="obs"></textarea>
+</div>
+
+<div class="item">
+<label>Molas hidráulicas bem afinadas</label>
+<input type="radio" class="ok" onclick="toggleObs('i3',false)"> OK
+<input type="radio" class="nok" data-desc="Molas hidráulicas bem afinadas" onclick="toggleObs('i3',true)"> NOK
+<textarea id="i3_obs" class="obs"></textarea>
+</div>
+
+</div>
+
+<!-- ADICIONA AS OUTRAS SECÇÕES SEGUINDO O MESMO PADRÃO -->
 
 <button type="submit">Submeter inspeção</button>
+
 </form>
-</div>
 
 </body>
 </html>
