@@ -68,7 +68,7 @@ function login(){
   } else alert("Credenciais inválidas");
 }
 
-const checklistData={
+const checklistData = {
   "Portas e Acessos":[
     "Portas abrem/fecham corretamente e sem ruídos",
     "Bateria da fechadura eletrónica",
@@ -76,6 +76,35 @@ const checklistData={
     "Molas hidráulicas bem afinadas",
     "Fecho/tranca porta principal funcional",
     "Batentes/limitadores e dobradiças sem folgas"
+  ],
+  "Eletricidade":[
+    "Iluminação geral","Candeeiros","Interruptores","Tomadas","Tomadas USB",
+    "Estado dos cabos e arrumados",
+    "Quadros/tampas elétricas bem fixas",
+    "Sensores de movimento dos roupeiros"
+  ],
+  "Climatização":[
+    "Ar condicionado funcional e sem ruídos",
+    "Grelhas de ar limpas",
+    "Extração WC funcional"
+  ],
+  "WC":[
+    "Sanita","Autoclismo","Duche com pressão adequada","Estado do duche de mão",
+    "Misturadoras","Ralos","Tampa sanita",
+    "Iluminação do espelho","Massa de juntas"
+  ],
+  "Equipamentos":[
+    "TV + Coluna WC","Comando TV","Telefone","Cofre","Mini-bar","Wi-Fi"
+  ],
+  "Estrutura / Acabamentos":[
+    "Indícios de humidade","Suportes amenities","Suportes gerais",
+    "Pintura","Papel de parede","Cabeceira",
+    "Cadeiras","Abat-jours","Janelas",
+    "Silicones","Mobiliário","Autocolantes WC"
+  ],
+  "Segurança":[
+    "Detetor de fumo funcional",
+    "Planta de emergência bem afixada"
   ]
 };
 
@@ -114,15 +143,14 @@ function prepararEnvio(){
     return false;
   }
 
-  const agora = new Date();
-  const dd = String(agora.getDate()).padStart(2,"0");
-  const mm = String(agora.getMonth()+1).padStart(2,"0");
-  const aa = agora.getFullYear();
-  const hh = String(agora.getHours()).padStart(2,"0");
-  const mi = String(agora.getMinutes()).padStart(2,"0");
+  const agora=new Date();
+  const dd=String(agora.getDate()).padStart(2,"0");
+  const mm=String(agora.getMonth()+1).padStart(2,"0");
+  const aa=agora.getFullYear();
+  const hh=String(agora.getHours()).padStart(2,"0");
+  const mi=String(agora.getMinutes()).padStart(2,"0");
 
-  document.getElementById("emailSubject").value =
-    `INSPECAO_QUARTO_${dd}.${mm}.${aa}_${hh}.${mi}`;
+  emailSubject.value=`INSPECAO_QUARTO_${dd}.${mm}.${aa}_${hh}.${mi}`;
 
   let msg=`DATA: ${dd}/${mm}/${aa} ${hh}:${mi}\nQUARTO: ${quarto.value}\n\n`;
   let primeiroErro=null;
@@ -133,9 +161,7 @@ function prepararEnvio(){
     if(chk.checked){
       temNok=true;
       const obs=document.getElementById("o"+i);
-      if(!obs.value && !primeiroErro){
-        primeiroErro=obs;
-      }
+      if(!obs.value && !primeiroErro) primeiroErro=obs;
       if(obs.value){
         const texto=chk.closest(".item").querySelector(".item-label").innerText;
         msg+=`NOK: ${texto}\nOBS: ${obs.value}\n\n`;
