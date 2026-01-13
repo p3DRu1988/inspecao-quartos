@@ -15,6 +15,7 @@ body {
 .hidden { display:none; }
 
 h1 { font-size:22px; }
+h2 { margin-top:0; }
 
 .section {
   background:#fff;
@@ -30,7 +31,28 @@ h1 { font-size:22px; }
   margin:10px 0;
 }
 
-label { font-weight:bold; }
+label.item-label {
+  font-weight:bold;
+  flex:1;
+}
+
+.toggle-wrapper {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.ok-text {
+  color:#2e7d32;
+  font-weight:bold;
+  font-size:14px;
+}
+
+.nok-text {
+  color:#c62828;
+  font-weight:bold;
+  font-size:14px;
+}
 
 textarea {
   width:100%;
@@ -41,27 +63,26 @@ textarea {
 
 .switch {
   position: relative;
-  width: 60px;
-  height: 28px;
+  width: 52px;
+  height: 26px;
 }
 
 .switch input { display:none; }
 
 .slider {
   position:absolute;
-  cursor:pointer;
   inset:0;
   background:#4caf50;
-  border-radius:28px;
+  border-radius:26px;
   transition:.3s;
 }
 
 .slider:before {
   position:absolute;
   content:"";
-  height:22px;
-  width:22px;
-  left:4px;
+  height:20px;
+  width:20px;
+  left:3px;
   bottom:3px;
   background:white;
   border-radius:50%;
@@ -73,7 +94,7 @@ input:checked + .slider {
 }
 
 input:checked + .slider:before {
-  transform: translateX(32px);
+  transform: translateX(26px);
 }
 
 button {
@@ -109,7 +130,7 @@ button {
   <input type="hidden" name="redirect" value="https://p3dru1988.github.io/inspecao-quartos/obrigado.html">
 
   <div class="section">
-    <label>Quarto nº</label>
+    <label><strong>Quarto nº</strong></label>
     <input type="number" id="quarto" style="width:100%;padding:8px;">
   </div>
 
@@ -120,9 +141,10 @@ button {
 </div>
 
 <script>
+/* sessão */
 if (sessionStorage.getItem("auth") === "ok") {
-  document.getElementById("loginBox").style.display="none";
-  document.getElementById("formBox").classList.remove("hidden");
+  loginBox.style.display="none";
+  formBox.classList.remove("hidden");
 }
 
 function login(){
@@ -133,28 +155,29 @@ function login(){
   } else alert("Credenciais inválidas");
 }
 
+/* checklist */
 const checklistData = {
   "Portas e Acessos":[
     "Portas abrem/fecham corretamente e sem ruídos",
     "Bateria da fechadura eletrónica",
     "Leitor de cartões funcional",
-    "Molas hidráulicas bem afinadas",
+    "Molas hidráulicas bem afinadas (sem bater a porta)",
     "Fecho/tranca porta principal funcional",
     "Batentes/limitadores e dobradiças sem folgas"
   ],
   "Eletricidade":[
     "Iluminação geral","Candeeiros","Interruptores","Tomadas","Tomadas USB",
     "Estado dos cabos e arrumados",
-    "Quadros elétricos bem fechados",
+    "Quadros elétricos bem fixos",
     "Sensores de movimento dos roupeiros"
   ],
   "Climatização":[
-    "Ar condicionado funcional",
+    "Ar condicionado funcional e sem ruídos",
     "Grelhas de ar limpas",
-    "Extração WC funcional"
+    "Extração do WC funcional"
   ],
   "WC":[
-    "Sanita","Autoclismo","Duche com pressão","Duche de mão",
+    "Sanita","Autoclismo","Duche com pressão adequada","Duche de mão",
     "Misturadoras","Ralos","Tampa sanita",
     "Iluminação espelho","Massa de juntas"
   ],
@@ -162,9 +185,10 @@ const checklistData = {
     "TV + Coluna WC","Comando TV","Telefone","Cofre","Mini-bar","Wi-Fi"
   ],
   "Estrutura / Acabamentos":[
-    "Humidades","Suportes amenities","Suportes gerais","Pintura",
-    "Papel de parede","Cabeceira","Cadeiras",
-    "Abat-jours","Janelas","Silicones","Mobiliário","Autocolantes"
+    "Indícios de humidade","Suportes amenities","Suportes gerais",
+    "Pintura","Papel de parede","Cabeceira",
+    "Cadeiras","Abat-jours","Janelas",
+    "Silicones","Mobiliário","Autocolantes"
   ],
   "Segurança":[
     "Detetor de fumo","Planta de emergência"
@@ -180,13 +204,17 @@ for(const sec in checklistData){
     idx++;
     s.innerHTML+=`
     <div class="item">
-      <label>${item}</label>
-      <label class="switch">
-        <input type="checkbox" id="i${idx}" onchange="toggleObs(${idx})">
-        <span class="slider"></span>
-      </label>
+      <label class="item-label">${item}</label>
+      <div class="toggle-wrapper">
+        <span class="ok-text">OK</span>
+        <label class="switch">
+          <input type="checkbox" id="i${idx}" onchange="toggleObs(${idx})">
+          <span class="slider"></span>
+        </label>
+        <span class="nok-text">NOK</span>
+      </div>
     </div>
-    <textarea id="o${idx}" placeholder="Observações"></textarea>`;
+    <textarea id="o${idx}" placeholder="Observações (obrigatório se NOK)"></textarea>`;
   });
   checklist.appendChild(s);
 }
@@ -203,15 +231,20 @@ function prepararEnvio(){
   let temNok=false;
 
   for(let i=1;i<=idx;i++){
-    if(document.getElementById("i"+i).checked){
+    const chk=document.getElementById("i"+i);
+    if(chk.checked){
       const obs=document.getElementById("o"+i);
       if(!obs.value){ obs.focus(); return false; }
       temNok=true;
-      msg+=`NOK: ${document.querySelector('label[for]').innerText}\nOBS: ${obs.value}\n\n`;
+      const texto=chk.closest(".item").querySelector(".item-label").innerText;
+      msg+=`NOK: ${texto}\nOBS: ${obs.value}\n\n`;
     }
   }
 
-  if(!temNok){ alert("Sem anomalias."); return false; }
+  if(!temNok){
+    alert("Inspeção sem anomalias. Nada a enviar.");
+    return false;
+  }
 
   finalMessage.value=msg;
   return true;
