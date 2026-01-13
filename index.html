@@ -6,27 +6,44 @@
 <title>Inspeção de Manutenção – Quartos</title>
 
 <style>
-body{font-family:Arial,sans-serif;background:#f4f4f4;padding:15px}
-.hidden{display:none}
-.section{background:#fff;padding:12px;margin-bottom:15px;border-radius:6px}
-.item{display:flex;justify-content:space-between;align-items:center;margin:10px 0}
-.item-label{font-weight:bold;flex:1}
-.toggle-wrapper{display:flex;align-items:center;gap:8px}
-.ok-text{color:#2e7d32;font-weight:bold}
-.nok-text{color:#c62828;font-weight:bold}
-textarea{width:100%;margin-top:6px;padding:6px;display:none}
-.switch{position:relative;width:52px;height:26px}
-.switch input{display:none}
-.slider{position:absolute;inset:0;background:#4caf50;border-radius:26px;transition:.3s}
-.slider:before{content:"";position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
-input:checked + .slider{background:#d32f2f}
-input:checked + .slider:before{transform:translateX(26px)}
-button{width:100%;padding:14px;font-size:16px;border:none;border-radius:6px;background:#0078d4;color:#fff}
+body { font-family: Arial, sans-serif; background:#f4f4f4; padding:15px; }
+.hidden { display:none; }
+.section { background:#fff; padding:12px; margin-bottom:15px; border-radius:6px; }
+.item { display:flex; justify-content:space-between; align-items:center; margin:10px 0; }
+.item-label { font-weight:bold; flex:1; }
+.toggle-wrapper { display:flex; align-items:center; gap:8px; }
+.ok-text { color:#2e7d32; font-weight:bold; }
+.nok-text { color:#c62828; font-weight:bold; }
+textarea { width:100%; margin-top:6px; padding:6px; display:none; }
+.switch { position:relative; width:52px; height:26px; }
+.switch input { display:none; }
+.slider { position:absolute; inset:0; background:#4caf50; border-radius:26px; transition:.3s; }
+.slider:before {
+  content:"";
+  position:absolute;
+  height:20px; width:20px;
+  left:3px; bottom:3px;
+  background:#fff;
+  border-radius:50%;
+  transition:.3s;
+}
+input:checked + .slider { background:#d32f2f; }
+input:checked + .slider:before { transform:translateX(26px); }
+button {
+  width:100%;
+  padding:14px;
+  font-size:16px;
+  border:none;
+  border-radius:6px;
+  background:#0078d4;
+  color:#fff;
+}
 </style>
 </head>
 
 <body>
 
+<!-- LOGIN -->
 <div id="loginBox" class="section">
   <h2>Login</h2>
   <input id="user" placeholder="Utilizador"><br><br>
@@ -34,18 +51,23 @@ button{width:100%;padding:14px;font-size:16px;border:none;border-radius:6px;back
   <button onclick="login()">Entrar</button>
 </div>
 
+<!-- FORM -->
 <div id="formBox" class="hidden">
 <h1>Inspeção de Manutenção – Quartos</h1>
 
-<form action="https://api.web3forms.com/submit" method="POST" onsubmit="return prepararEnvio();">
+<form action="https://api.web3forms.com/submit"
+      method="POST"
+      onsubmit="return prepararEnvio();">
+
 <input type="hidden" name="access_key" value="6ccbebc1-4c92-4054-b56e-cc65b49ed8ec">
 <input type="hidden" name="subject" id="emailSubject">
 <input type="hidden" name="message" id="finalMessage">
-<input type="hidden" name="redirect" value="https://p3dru1988.github.io/inspecao-quartos/obrigado.html">
+<input type="hidden" name="redirect"
+       value="https://p3dru1988.github.io/inspecao-quartos/obrigado.html">
 
 <div class="section">
-<label><strong>Quarto nº</strong></label>
-<input type="number" id="quarto" style="width:100%;padding:8px">
+  <label><strong>Quarto nº</strong></label>
+  <input type="number" id="quarto" style="width:100%;padding:8px">
 </div>
 
 <div id="checklist"></div>
@@ -55,131 +77,152 @@ button{width:100%;padding:14px;font-size:16px;border:none;border-radius:6px;back
 </div>
 
 <script>
-if(sessionStorage.getItem("auth")==="ok"){
-  loginBox.style.display="none";
+// Sessão
+if (sessionStorage.getItem("auth") === "ok") {
+  loginBox.style.display = "none";
   formBox.classList.remove("hidden");
 }
 
-function login(){
-  if(user.value==="pedro" && pass.value==="mnt"){
-    sessionStorage.setItem("auth","ok");
-    loginBox.style.display="none";
+function login() {
+  if (user.value === "pedro" && pass.value === "mnt") {
+    sessionStorage.setItem("auth", "ok");
+    loginBox.style.display = "none";
     formBox.classList.remove("hidden");
-  } else alert("Credenciais inválidas");
+  } else {
+    alert("Credenciais inválidas");
+  }
 }
 
+// Checklist
 const checklistData = {
-  "Portas e Acessos":[
+  "Portas e Acessos": [
     "Portas abrem/fecham corretamente e sem ruídos",
     "Bateria da fechadura eletrónica",
-    "Leitor de cartões",
+    "Leitor de cartões funcional",
     "Molas hidráulicas bem afinadas",
-    "Fecho/tranca porta principal",
+    "Fecho/tranca porta principal funcional",
     "Batentes/limitadores e dobradiças sem folgas"
   ],
-  "Eletricidade":[
+  "Eletricidade": [
     "Iluminação geral","Candeeiros","Interruptores","Tomadas","Tomadas USB",
-    "Estado dos cabos e arrumados (com abraçadeira)",
-    "Quadros/tampas elétricas bem fixas e fechados",
+    "Estado dos cabos e arrumados",
+    "Quadros/tampas elétricas bem fixas",
     "Sensores de movimento dos roupeiros"
   ],
-  "Climatização":[
+  "Climatização": [
     "Ar condicionado funcional e sem ruídos",
     "Grelhas de ar limpas",
-    "Extração WC"
+    "Extração WC funcional"
   ],
-  "WC":[
+  "WC": [
     "Sanita","Autoclismo","Duche com pressão adequada","Estado do duche de mão",
     "Misturadoras","Ralos","Tampa sanita",
     "Iluminação do espelho","Massa de juntas"
   ],
-  "Equipamentos":[
+  "Equipamentos": [
     "TV + Coluna WC","Comando TV","Telefone","Cofre","Mini-bar","Wi-Fi"
   ],
-  "Estrutura / Acabamentos":[
+  "Estrutura / Acabamentos": [
     "Indícios de humidade","Suportes amenities","Suportes gerais",
     "Pintura","Papel de parede","Cabeceira",
     "Cadeiras","Abat-jours","Janelas",
-    "Silicones","Mobiliário","Autocolantes WC + teclas"
+    "Silicones","Mobiliário","Autocolantes WC"
   ],
-  "Segurança":[
+  "Segurança": [
     "Detetor de fumo funcional",
     "Planta de emergência bem afixada"
   ]
 };
 
-let idx=0;
-for(const sec in checklistData){
-  const s=document.createElement("div");
-  s.className="section";
-  s.innerHTML=`<h2>${sec}</h2>`;
-  checklistData[sec].forEach(item=>{
+let idx = 0;
+const checklist = document.getElementById("checklist");
+
+for (const sec in checklistData) {
+  const s = document.createElement("div");
+  s.className = "section";
+  s.innerHTML = `<h2>${sec}</h2>`;
+
+  checklistData[sec].forEach(item => {
     idx++;
-    s.innerHTML+=`
-    <div class="item">
-      <span class="item-label">${item}</span>
-      <div class="toggle-wrapper">
-        <span class="ok-text">OK</span>
-        <label class="switch">
-          <input type="checkbox" id="i${idx}" onchange="toggleObs(${idx})">
-          <span class="slider"></span>
-        </label>
-        <span class="nok-text">NOK</span>
+    s.innerHTML += `
+      <div class="item">
+        <span class="item-label">${item}</span>
+        <div class="toggle-wrapper">
+          <span class="ok-text">OK</span>
+          <label class="switch">
+            <input type="checkbox" id="i${idx}" onchange="toggleObs(${idx})">
+            <span class="slider"></span>
+          </label>
+          <span class="nok-text">NOK</span>
+        </div>
       </div>
-    </div>
-    <textarea id="o${idx}" placeholder="Observações (preenchimento obrigatório)"></textarea>`;
+      <textarea id="o${idx}" placeholder="Observações (obrigatório se NOK)"></textarea>
+    `;
   });
+
   checklist.appendChild(s);
 }
 
-function toggleObs(i){
-  document.getElementById("o"+i).style.display =
-    document.getElementById("i"+i).checked ? "block":"none";
+function toggleObs(i) {
+  document.getElementById("o" + i).style.display =
+    document.getElementById("i" + i).checked ? "block" : "none";
 }
 
-function prepararEnvio(){
-  if(!quarto.value){
+// SUBMIT
+function prepararEnvio() {
+  if (!quarto.value) {
     quarto.focus();
     return false;
   }
 
-  const agora=new Date();
-  const dd=String(agora.getDate()).padStart(2,"0");
-  const mm=String(agora.getMonth()+1).padStart(2,"0");
-  const aa=agora.getFullYear();
-  const hh=String(agora.getHours()).padStart(2,"0");
-  const mi=String(agora.getMinutes()).padStart(2,"0");
+  const agora = new Date();
+  const dd = String(agora.getDate()).padStart(2,"0");
+  const mm = String(agora.getMonth()+1).padStart(2,"0");
+  const aa = agora.getFullYear();
+  const hh = String(agora.getHours()).padStart(2,"0");
+  const mi = String(agora.getMinutes()).padStart(2,"0");
 
-  emailSubject.value=`INSPECAO_QUARTO_${dd}.${mm}.${aa}_${hh}.${mi}`;
+  emailSubject.value = `INSPECAO_QUARTO_${dd}.${mm}.${aa}_${hh}.${mi}`;
 
-  let msg=`DATA: ${dd}/${mm}/${aa} ${hh}:${mi}\nQUARTO: ${quarto.value}\n\n`;
-  let primeiroErro=null;
-  let temNok=false;
+  let msg =
+`DATA: ${dd}/${mm}/${aa} ${hh}:${mi}
+QUARTO: ${quarto.value}
 
-  for(let i=1;i<=idx;i++){
-    const chk=document.getElementById("i"+i);
-    if(chk.checked){
-      temNok=true;
-      const obs=document.getElementById("o"+i);
-      if(!obs.value && !primeiroErro) primeiroErro=obs;
-      if(obs.value){
-        const texto=chk.closest(".item").querySelector(".item-label").innerText;
-        msg+=`NOK: ${texto}\nOBS: ${obs.value}\n\n`;
+`;
+
+  let primeiroErro = null;
+  let temNok = false;
+
+  for (let i = 1; i <= idx; i++) {
+    const chk = document.getElementById("i" + i);
+    if (chk.checked) {
+      temNok = true;
+      const obs = document.getElementById("o" + i);
+      if (!obs.value && !primeiroErro) primeiroErro = obs;
+      if (obs.value) {
+        const texto = chk.closest(".item")
+                          .querySelector(".item-label").innerText;
+        msg += `NOK: ${texto}\nOBS: ${obs.value}\n\n`;
       }
     }
   }
 
-  if(primeiroErro){
+  if (primeiroErro) {
     primeiroErro.focus();
     return false;
   }
 
-  if(!temNok){
-    alert("Inspeção sem anomalias. Nada a enviar.");
-    return false;
+  if (!temNok) {
+    const confirmar = confirm(
+      "Confirma que o quarto está totalmente OK e pretende submeter a inspeção?"
+    );
+    if (!confirmar) return false;
+    msg += "ESTADO: OK\n";
+  } else {
+    msg = msg.replace("\n\n", "\nESTADO: NOK\n\n");
   }
 
-  finalMessage.value=msg;
+  finalMessage.value = msg;
   return true;
 }
 </script>
