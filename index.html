@@ -6,62 +6,43 @@
 <title>Inspeção de Manutenção – Quartos</title>
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background:#f4f4f4;
-  padding:15px;
-}
+body { font-family: Arial, sans-serif; background:#f4f4f4; padding:15px; }
 h1 { font-size:22px; }
-.section {
-  background:#fff;
-  padding:15px;
-  margin-bottom:15px;
-  border-radius:6px;
-}
+.section { background:#fff; padding:15px; margin-bottom:15px; border-radius:6px; }
 .item { margin-bottom:14px; }
 label { font-weight:bold; display:block; }
-.obs {
-  display:none;
-  width:100%;
-  margin-top:6px;
-}
-button {
-  background:#0078d4;
-  color:#fff;
-  padding:14px;
-  width:100%;
-  border:none;
-  border-radius:6px;
-  font-size:16px;
-}
+.obs { display:none; width:100%; margin-top:6px; }
+button { background:#0078d4; color:#fff; padding:14px; width:100%; border:none; border-radius:6px; font-size:16px; }
 </style>
 
 <script>
 function toggleObs(id, nok) {
-  const obs = document.getElementById(id + "_obs");
+  const obs = document.getElementById(id+"_obs");
   obs.style.display = nok ? "block" : "none";
 }
 
 function prepararEnvio() {
-  const quarto = document.getElementById("quarto").value.trim();
-  if (!quarto) {
+  const quarto = document.getElementById("quarto");
+  if (!quarto.value.trim()) {
     alert("Indique o número do quarto.");
-    document.getElementById("quarto").focus();
+    quarto.focus();
     return false;
   }
 
   const hoje = new Date().toLocaleDateString("pt-PT");
-  let mensagem = `Data: ${hoje}\nQuarto: ${quarto}\n\n`;
-  let temNOK = false;
+  let texto = `Data: ${hoje}\nQuarto: ${quarto.value}\n\nNOK:\n`;
+  let encontrouNOK = false;
 
-  document.querySelectorAll(".item").forEach(item => {
+  const itens = document.querySelectorAll(".item");
+
+  for (const item of itens) {
     const ok = item.querySelector(".ok");
     const nok = item.querySelector(".nok");
     const obs = item.querySelector("textarea");
 
     if (!ok.checked && !nok.checked) {
       alert("Todos os itens devem ser marcados como OK ou NOK.");
-      item.scrollIntoView({ behavior:"smooth", block:"center" });
+      item.scrollIntoView({behavior:"smooth", block:"center"});
       return false;
     }
 
@@ -69,23 +50,23 @@ function prepararEnvio() {
       if (!obs.value.trim()) {
         alert("Observação obrigatória nos itens NOK.");
         obs.style.display="block";
-        obs.scrollIntoView({ behavior:"smooth", block:"center" });
+        obs.scrollIntoView({behavior:"smooth", block:"center"});
         setTimeout(()=>obs.focus(),300);
-        throw "Erro";
+        return false;
       }
-      temNOK = true;
-      mensagem += `NOK: ${nok.dataset.desc}\n`;
-      mensagem += `Obs.: ${obs.value}\n\n`;
-    }
-  });
 
-  if (!temNOK) {
+      encontrouNOK = true;
+      texto += `- ${nok.dataset.desc}\n  Obs.: ${obs.value}\n\n`;
+    }
+  }
+
+  if (!encontrouNOK) {
     alert("Inspeção sem anomalias. Nada a enviar.");
     return false;
   }
 
-  document.getElementById("finalMessage").value = mensagem;
-  return true;
+  document.getElementById("finalMessage").value = texto;
+  return true; // ✅ só aqui envia
 }
 </script>
 </head>
@@ -94,9 +75,12 @@ function prepararEnvio() {
 
 <h1>Inspeção de Manutenção – Quartos</h1>
 
-<form action="https://api.web3forms.com/submit" method="POST" onsubmit="return prepararEnvio()">
+<form action="https://api.web3forms.com/submit"
+      method="POST"
+      onsubmit="return prepararEnvio();">
 
-<input type="hidden" name="access_key" value="COLOCA_AQUI_A_TUA_ACCESS_KEY">
+<!-- WEB3FORMS -->
+<input type="hidden" name="access_key" value="6ccbebc1-4c92-4054-b56e-cc65b49ed8ec">
 <input type="hidden" name="subject" value="INSPECAO_DIARIA">
 <input type="hidden" name="message" id="finalMessage">
 
@@ -105,37 +89,33 @@ function prepararEnvio() {
 <input type="number" id="quarto" style="width:100%;padding:8px;">
 </div>
 
-<!-- EXEMPLO DE ITEM -->
 <div class="section">
 <h2>Portas e Acessos</h2>
 
 <div class="item">
 <label>Portas abrem/fecham corretamente e sem ruídos</label>
-<input type="radio" class="ok" onclick="toggleObs('i1',false)"> OK
+<input type="radio" class="ok"> OK
 <input type="radio" class="nok" data-desc="Portas abrem/fecham corretamente e sem ruídos" onclick="toggleObs('i1',true)"> NOK
 <textarea id="i1_obs" class="obs" placeholder="Observações"></textarea>
 </div>
 
 <div class="item">
 <label>Bateria da fechadura eletrónica</label>
-<input type="radio" class="ok" onclick="toggleObs('i2',false)"> OK
+<input type="radio" class="ok"> OK
 <input type="radio" class="nok" data-desc="Bateria da fechadura eletrónica" onclick="toggleObs('i2',true)"> NOK
 <textarea id="i2_obs" class="obs"></textarea>
 </div>
 
 <div class="item">
 <label>Molas hidráulicas bem afinadas</label>
-<input type="radio" class="ok" onclick="toggleObs('i3',false)"> OK
+<input type="radio" class="ok"> OK
 <input type="radio" class="nok" data-desc="Molas hidráulicas bem afinadas" onclick="toggleObs('i3',true)"> NOK
 <textarea id="i3_obs" class="obs"></textarea>
 </div>
 
 </div>
 
-<!-- ADICIONA AS OUTRAS SECÇÕES SEGUINDO O MESMO PADRÃO -->
-
 <button type="submit">Submeter inspeção</button>
-
 </form>
 
 </body>
