@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inspeção de Manutenção – Quartos</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background:#f4f4f4;
+  padding:15px;
+}
+h1 {
+  font-size:20px;
+  margin-bottom:10px;
+}
+.section {
+  background:#fff;
+  padding:12px;
+  margin-bottom:15px;
+  border-radius:6px;
+}
+.item {
+  margin-bottom:14px;
+}
+label {
+  font-weight:bold;
+}
+.obs {
+  display:none;
+  margin-top:6px;
+  width:100%;
+}
+button {
+  background:#0078d4;
+  color:#fff;
+  padding:14px;
+  border:none;
+  border-radius:6px;
+  width:100%;
+  font-size:16px;
+}
+</style>
+
+<script>
+function toggleObs(id, isNOK) {
+  document.getElementById(id + "_obs").style.display = isNOK ? "block" : "none";
+}
+
+function validarFormulario() {
+  const itens = document.querySelectorAll(".item");
+  for (let div of itens) {
+    const ok = div.querySelector(".ok");
+    const nok = div.querySelector(".nok");
+    const obs = div.querySelector("textarea");
+
+    if (!ok.checked && !nok.checked) {
+      alert("Todos os itens devem ser marcados como OK ou NOK.");
+      return false;
+    }
+
+    if (nok.checked && obs.value.trim() === "") {
+      alert("Os itens NOK obrigam a observações.");
+      return false;
+    }
+  }
+  return true;
+}
+</script>
+</head>
+
+<body>
+
+<h1>Inspeção de Manutenção – Quartos</h1>
+
+<form action="https://api.web3forms.com/submit"
+      method="POST"
+      onsubmit="return validarFormulario();">
+
+<!-- ACCESS KEY WEB3FORMS -->
+<input type="hidden" name="access_key" value="6ccbebc1-4c92-4054-b56e-cc65b49ed8ec">
+
+<!-- EMAIL DESTINO -->
+<input type="hidden" name="to" value="maintenance@bessahotel.com">
+
+<!-- ASSUNTO (o VBA vai usar isto depois) -->
+<input type="hidden" name="subject" value="INSPECAO_DIARIA">
+
+<!-- ================= DADOS GERAIS ================= -->
+
+<div class="section">
+  <label>Quarto nº</label><br>
+  <input type="number" name="Quarto" required style="width:100%;padding:8px;">
+</div>
+
+<div class="section">
+  <label>Data da inspeção</label><br>
+  <input type="date" name="Data" required style="width:100%;padding:8px;">
+</div>
+
+<!-- ================= PORTAS E ACESSOS ================= -->
+
+<div class="section">
+<h2>Portas e Acessos</h2>
+
+<div class="item">
+  <label>Portas abrem/fecham corretamente e sem ruídos</label><br>
+  <input type="radio" class="ok"  name="Portas_ruido" value="OK"  onclick="toggleObs('i1',false)"> OK
+  <input type="radio" class="nok" name="Portas_ruido" value="NOK" onclick="toggleObs('i1',true)"> NOK
+  <textarea id="i1_obs" class="obs" name="Obs_Portas_ruido" placeholder="Observações"></textarea>
+</div>
+
+<div class="item">
+  <label>Bateria da fechadura eletrónica</label><br>
+  <input type="radio" class="ok"  name="Bateria_fechadura" value="OK"  onclick="toggleObs('i2',false)"> OK
+  <input type="radio" class="nok" name="Bateria_fechadura" value="NOK" onclick="toggleObs('i2',true)"> NOK
+  <textarea id="i2_obs" class="obs" name="Obs_Bateria_fechadura" placeholder="Observações"></textarea>
+</div>
+
+<div class="item">
+  <label>Leitor de cartões funcional</label><br>
+  <input type="radio" class="ok"  name="Leitor_cartoes" value="OK"  onclick="toggleObs('i3',false)"> OK
+  <input type="radio" class="nok" name="Leitor_cartoes" value="NOK" onclick="toggleObs('i3',true)"> NOK
+  <textarea id="i3_obs" class="obs" name="Obs_Leitor_cartoes" placeholder="Observações"></textarea>
+</div>
+
+<div class="item">
+  <label>Molas hidráulicas bem afinadas</label><br>
+  <input type="radio" class="ok"  name="Molas_hidraulicas" value="OK"  onclick="toggleObs('i4',false)"> OK
+  <input type="radio" class="nok" name="Molas_hidraulicas" value="NOK" onclick="toggleObs('i4',true)"> NOK
+  <textarea id="i4_obs" class="obs" name="Obs_Molas_hidraulicas" placeholder="Observações"></textarea>
+</div>
+
+<div class="item">
+  <label>Batentes / dobradiças sem folgas</label><br>
+  <input type="radio" class="ok"  name="Batentes_dobradiças" value="OK"  onclick="toggleObs('i5',false)"> OK
+  <input type="radio" class="nok" name="Batentes_dobradiças" value="NOK" onclick="toggleObs('i5',true)"> NOK
+  <textarea id="i5_obs" class="obs" name="Obs_Batentes_dobradiças" placeholder="Observações"></textarea>
+</div>
+
+</div>
+
+<!-- ================= SUBMETER ================= -->
+
+<button type="submit">Submeter inspeção</button>
+
+</form>
+
+</body>
+</html>
