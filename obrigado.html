@@ -3,28 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inspeção submetida</title>
+<title>Inspeção Submetida</title>
+
 <style>
 body {
   font-family: Arial, sans-serif;
   background:#f4f4f4;
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
   height:100vh;
 }
+
 .box {
   background:#fff;
   padding:30px;
   border-radius:8px;
   text-align:center;
+  width:100%;
+  max-width:400px;
 }
+
+button {
+  width:100%;
+  padding:14px;
+  font-size:16px;
+  margin-top:15px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.novo { background:#0078d4; color:#fff; }
+.sair { background:#ccc; color:#000; }
 </style>
+
+<script>
+function novo(){
+  sessionStorage.setItem("auth","ok");
+  window.location.href="index.html";
+}
+function sair(){
+  window.location.href="https://www.google.pt";
+}
+</script>
 </head>
+
 <body>
 <div class="box">
-  <h2>Inspeção submetida com sucesso</h2>
-  <p>Pode fechar esta página ou iniciar nova inspeção.</p>
+  <h2>Inspeção submetida</h2>
+  <p>Dados enviados com sucesso.</p>
+
+  <button class="novo" onclick="novo()">Inspecionar outro quarto</button>
+  <button class="sair" onclick="sair()">Sair</button>
 </div>
 </body>
 </html>
