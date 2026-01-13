@@ -52,9 +52,13 @@ function prepararEnvio(){
 
     if (nok.checked) {
       if (obs.value.trim() === "") {
-        alert("Observação obrigatória nos itens NOK.");
-        obs.focus();
-        return false;
+  alert("Observação obrigatória nos itens NOK.");
+
+  obs.style.display = "block"; // garante que está visível
+  obs.scrollIntoView({ behavior: "smooth", block: "center" });
+  setTimeout(() => obs.focus(), 300); // essencial no iPad
+
+  return false;
       }
       temNOK = true;
       txt += "- " + nok.dataset.desc + "\n  Obs: " + obs.value + "\n\n";
