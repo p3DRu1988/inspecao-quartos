@@ -6,133 +6,96 @@
 <title>Inspeção de Manutenção – Quartos</title>
 
 <style>
-body { font-family: Arial, sans-serif; background:#f4f4f4; padding:15px; }
-h1,h2 { margin-top:0; }
-.section { background:#fff; padding:15px; margin-bottom:15px; border-radius:6px; }
-.item { margin-bottom:14px; }
-label { font-weight:bold; display:block; margin-bottom:6px; }
-.obs { display:none; width:100%; margin-top:6px; }
-
-/* BOTÃO */
-button {
-  background:#0078d4; color:#fff; padding:14px;
-  width:100%; border:none; border-radius:6px; font-size:16px;
+body {
+  font-family: Arial, sans-serif;
+  background:#f4f4f4;
+  padding:15px;
 }
 
 .hidden { display:none; }
 
-/* INTERRUPTOR */
-.switch-container {
-  display:flex;
-  align-items:center;
-  gap:10px;
+h1 { font-size:22px; }
+
+.section {
+  background:#fff;
+  padding:12px;
+  margin-bottom:15px;
+  border-radius:6px;
 }
 
-.ok-label { color:#2e7d32; font-weight:bold; }
-.nok-label { color:#c62828; font-weight:bold; }
+.item {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:10px 0;
+}
+
+label { font-weight:bold; }
+
+textarea {
+  width:100%;
+  margin-top:6px;
+  padding:6px;
+  display:none;
+}
 
 .switch {
-  position:relative;
-  width:52px;
-  height:26px;
+  position: relative;
+  width: 60px;
+  height: 28px;
 }
 
-.switch input {
-  opacity:0; width:0; height:0;
-}
+.switch input { display:none; }
 
 .slider {
   position:absolute;
+  cursor:pointer;
   inset:0;
   background:#4caf50;
-  border-radius:26px;
+  border-radius:28px;
   transition:.3s;
 }
 
 .slider:before {
-  content:"";
   position:absolute;
-  height:20px; width:20px;
-  left:3px; bottom:3px;
+  content:"";
+  height:22px;
+  width:22px;
+  left:4px;
+  bottom:3px;
   background:white;
   border-radius:50%;
   transition:.3s;
 }
 
-.switch input:checked + .slider {
+input:checked + .slider {
   background:#d32f2f;
 }
 
-.switch input:checked + .slider:before {
-  transform:translateX(26px);
+input:checked + .slider:before {
+  transform: translateX(32px);
+}
+
+button {
+  width:100%;
+  padding:14px;
+  font-size:16px;
+  border:none;
+  border-radius:6px;
+  background:#0078d4;
+  color:#fff;
 }
 </style>
-
-<script>
-/* LOGIN */
-function login() {
-  if (user.value === "pedro" && pass.value === "mnt") {
-    loginBox.style.display = "none";
-    formBox.style.display = "block";
-  } else {
-    alert("Credenciais inválidas.");
-  }
-}
-
-/* TOGGLE */
-function toggleSwitch(el, id) {
-  document.getElementById(id+"_obs").style.display = el.checked ? "block" : "none";
-}
-
-/* SUBMISSÃO */
-function prepararEnvio() {
-  const quarto = document.getElementById("quarto");
-  if (!quarto.value.trim()) {
-    alert("Indique o número do quarto.");
-    quarto.focus();
-    return false;
-  }
-
-  const data = new Date().toLocaleDateString("pt-PT");
-  let texto = `Data: ${data}\nQuarto: ${quarto.value}\n\nNOK:\n`;
-  let temNOK = false;
-
-  for (const item of document.querySelectorAll(".item")) {
-    const sw = item.querySelector(".nok-switch");
-    const obs = item.querySelector("textarea");
-
-    if (sw.checked) {
-      if (!obs.value.trim()) {
-        alert("Observação obrigatória nos itens NOK.");
-        obs.style.display="block";
-        obs.scrollIntoView({behavior:"smooth", block:"center"});
-        setTimeout(()=>obs.focus(),300);
-        return false;
-      }
-      temNOK = true;
-      texto += `- ${sw.dataset.desc}\n  Obs.: ${obs.value}\n\n`;
-    }
-  }
-
-  if (!temNOK) {
-    alert("Inspeção sem anomalias. Nada a enviar.");
-    return false;
-  }
-
-  finalMessage.value = texto;
-  return true;
-}
-</script>
 </head>
 
 <body>
 
 <!-- LOGIN -->
 <div id="loginBox" class="section">
-<h2>Acesso</h2>
-<input id="user" placeholder="Utilizador"><br><br>
-<input id="pass" type="password" placeholder="Password"><br><br>
-<button onclick="login()">Entrar</button>
+  <h1>Login</h1>
+  <input id="user" placeholder="Utilizador"><br><br>
+  <input id="pass" type="password" placeholder="Password"><br><br>
+  <button onclick="login()">Entrar</button>
 </div>
 
 <!-- FORM -->
@@ -140,88 +103,120 @@ function prepararEnvio() {
 <h1>Inspeção de Manutenção – Quartos</h1>
 
 <form action="https://api.web3forms.com/submit" method="POST" onsubmit="return prepararEnvio();">
-<input type="hidden" name="access_key" value="6ccbebc1-4c92-4054-b56e-cc65b49ed8ec">
-<input type="hidden" name="subject" value="INSPECAO_DIARIA">
-<input type="hidden" name="message" id="finalMessage">
-<input type="hidden" name="redirect" value="https://p3dru1988.github.io/inspecao-quartos/obrigado.html">
+  <input type="hidden" name="access_key" value="6ccbebc1-4c92-4054-b56e-cc65b49ed8ec">
+  <input type="hidden" name="subject" value="INSPECAO_DIARIA">
+  <input type="hidden" name="message" id="finalMessage">
+  <input type="hidden" name="redirect" value="https://p3dru1988.github.io/inspecao-quartos/obrigado.html">
 
+  <div class="section">
+    <label>Quarto nº</label>
+    <input type="number" id="quarto" style="width:100%;padding:8px;">
+  </div>
 
-<div class="section">
-<label>Quarto nº</label>
-<input type="number" id="quarto" style="width:100%;padding:8px;">
-</div>
+  <div id="checklist"></div>
 
-<script>
-const checklist = {
-"Portas e Acessos":[
-"Portas abrem/fecham corretamente e sem ruídos",
-"Bateria da fechadura eletrónica",
-"Leitor de cartões funcional",
-"Molas hidráulicas bem afinadas",
-"Fecho/tranca porta principal funcional",
-"Batentes/limitadores e dobradiças sem folgas"
-],
-"Eletricidade":[
-"Iluminação geral","Candeeiros","Interruptores","Tomadas","Tomadas USB",
-"Estado dos cabos e arrumados (com abraçadeira)",
-"Quadros / tampas elétricas bem fixas",
-"Sensores de movimento dos roupeiros"
-],
-"Climatização":[
-"Ar condicionado funcional e sem ruídos",
-"Grelhas de ar desobstruídas",
-"Extração do WC funcional"
-],
-"WC":[
-"Sanita desentupida","Autoclismo funcional",
-"Duche com pressão adequada","Estado do duche de mão",
-"Misturadoras funcionais","Ralos com escoamento normal",
-"Tampa sanita","Iluminação espelho","Massa de juntas"
-],
-"Equipamentos":[
-"TV + Coluna WC","Comando TV","Telefone",
-"Cofre","Mini-bar","Wi-Fi"
-],
-"Estrutura / Acabamentos":[
-"Indícios de humidade","Suportes de amenities",
-"Suportes gerais","Pintura geral",
-"Papel de parede","Cabeceira de cama",
-"Cadeiras","Abat-jours","Janelas",
-"Silicones","Mobiliário","Autocolantes WC"
-],
-"Segurança":[
-"Detetor de fumo funcional",
-"Planta de emergência bem afixada"
-]
-};
-
-let id=1;
-for (const sec in checklist) {
-  document.write(`<div class="section"><h2>${sec}</h2>`);
-  checklist[sec].forEach(t=>{
-    document.write(`
-    <div class="item">
-      <label>${t}</label>
-      <div class="switch-container">
-        <span class="ok-label">OK</span>
-        <label class="switch">
-          <input type="checkbox" class="nok-switch" data-desc="${t}" onchange="toggleSwitch(this,'i${id}')">
-          <span class="slider"></span>
-        </label>
-        <span class="nok-label">NOK</span>
-      </div>
-      <textarea id="i${id}_obs" class="obs" placeholder="Observações"></textarea>
-    </div>`);
-    id++;
-  });
-  document.write("</div>");
-}
-</script>
-
-<button type="submit">Submeter inspeção</button>
+  <button type="submit">Submeter inspeção</button>
 </form>
 </div>
 
+<script>
+if (sessionStorage.getItem("auth") === "ok") {
+  document.getElementById("loginBox").style.display="none";
+  document.getElementById("formBox").classList.remove("hidden");
+}
+
+function login(){
+  if(user.value==="pedro" && pass.value==="mnt"){
+    sessionStorage.setItem("auth","ok");
+    loginBox.style.display="none";
+    formBox.classList.remove("hidden");
+  } else alert("Credenciais inválidas");
+}
+
+const checklistData = {
+  "Portas e Acessos":[
+    "Portas abrem/fecham corretamente e sem ruídos",
+    "Bateria da fechadura eletrónica",
+    "Leitor de cartões funcional",
+    "Molas hidráulicas bem afinadas",
+    "Fecho/tranca porta principal funcional",
+    "Batentes/limitadores e dobradiças sem folgas"
+  ],
+  "Eletricidade":[
+    "Iluminação geral","Candeeiros","Interruptores","Tomadas","Tomadas USB",
+    "Estado dos cabos e arrumados",
+    "Quadros elétricos bem fechados",
+    "Sensores de movimento dos roupeiros"
+  ],
+  "Climatização":[
+    "Ar condicionado funcional",
+    "Grelhas de ar limpas",
+    "Extração WC funcional"
+  ],
+  "WC":[
+    "Sanita","Autoclismo","Duche com pressão","Duche de mão",
+    "Misturadoras","Ralos","Tampa sanita",
+    "Iluminação espelho","Massa de juntas"
+  ],
+  "Equipamentos":[
+    "TV + Coluna WC","Comando TV","Telefone","Cofre","Mini-bar","Wi-Fi"
+  ],
+  "Estrutura / Acabamentos":[
+    "Humidades","Suportes amenities","Suportes gerais","Pintura",
+    "Papel de parede","Cabeceira","Cadeiras",
+    "Abat-jours","Janelas","Silicones","Mobiliário","Autocolantes"
+  ],
+  "Segurança":[
+    "Detetor de fumo","Planta de emergência"
+  ]
+};
+
+let idx=0;
+for(const sec in checklistData){
+  const s=document.createElement("div");
+  s.className="section";
+  s.innerHTML=`<h2>${sec}</h2>`;
+  checklistData[sec].forEach(item=>{
+    idx++;
+    s.innerHTML+=`
+    <div class="item">
+      <label>${item}</label>
+      <label class="switch">
+        <input type="checkbox" id="i${idx}" onchange="toggleObs(${idx})">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <textarea id="o${idx}" placeholder="Observações"></textarea>`;
+  });
+  checklist.appendChild(s);
+}
+
+function toggleObs(i){
+  document.getElementById("o"+i).style.display =
+    document.getElementById("i"+i).checked ? "block" : "none";
+}
+
+function prepararEnvio(){
+  if(!quarto.value){ quarto.focus(); return false; }
+
+  let msg=`DATA: ${new Date().toLocaleDateString("pt-PT")}\nQUARTO: ${quarto.value}\n\n`;
+  let temNok=false;
+
+  for(let i=1;i<=idx;i++){
+    if(document.getElementById("i"+i).checked){
+      const obs=document.getElementById("o"+i);
+      if(!obs.value){ obs.focus(); return false; }
+      temNok=true;
+      msg+=`NOK: ${document.querySelector('label[for]').innerText}\nOBS: ${obs.value}\n\n`;
+    }
+  }
+
+  if(!temNok){ alert("Sem anomalias."); return false; }
+
+  finalMessage.value=msg;
+  return true;
+}
+</script>
+
 </body>
 </html>
-
