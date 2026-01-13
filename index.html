@@ -39,7 +39,7 @@ button{width:100%;padding:14px;font-size:16px;border:none;border-radius:6px;back
 
 <form action="https://api.web3forms.com/submit" method="POST" onsubmit="return prepararEnvio();">
 <input type="hidden" name="access_key" value="6ccbebc1-4c92-4054-b56e-cc65b49ed8ec">
-<input type="hidden" name="subject" value="INSPECAO_DIARIA">
+<input type="hidden" name="subject" id="emailSubject">
 <input type="hidden" name="message" id="finalMessage">
 <input type="hidden" name="redirect" value="https://p3dru1988.github.io/inspecao-quartos/obrigado.html">
 
@@ -114,7 +114,17 @@ function prepararEnvio(){
     return false;
   }
 
-  let msg=`DATA: ${new Date().toLocaleDateString("pt-PT")}\nQUARTO: ${quarto.value}\n\n`;
+  const agora = new Date();
+  const dd = String(agora.getDate()).padStart(2,"0");
+  const mm = String(agora.getMonth()+1).padStart(2,"0");
+  const aa = agora.getFullYear();
+  const hh = String(agora.getHours()).padStart(2,"0");
+  const mi = String(agora.getMinutes()).padStart(2,"0");
+
+  document.getElementById("emailSubject").value =
+    `INSPECAO_QUARTO_${dd}.${mm}.${aa}_${hh}.${mi}`;
+
+  let msg=`DATA: ${dd}/${mm}/${aa} ${hh}:${mi}\nQUARTO: ${quarto.value}\n\n`;
   let primeiroErro=null;
   let temNok=false;
 
