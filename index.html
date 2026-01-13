@@ -6,143 +6,56 @@
 <title>Inspeção de Manutenção – Quartos</title>
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background:#f4f4f4;
-  padding:15px;
-}
-
-.hidden { display:none; }
-
-h1 { font-size:22px; }
-h2 { margin-top:0; }
-
-.section {
-  background:#fff;
-  padding:12px;
-  margin-bottom:15px;
-  border-radius:6px;
-}
-
-.item {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin:10px 0;
-}
-
-label.item-label {
-  font-weight:bold;
-  flex:1;
-}
-
-.toggle-wrapper {
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.ok-text {
-  color:#2e7d32;
-  font-weight:bold;
-  font-size:14px;
-}
-
-.nok-text {
-  color:#c62828;
-  font-weight:bold;
-  font-size:14px;
-}
-
-textarea {
-  width:100%;
-  margin-top:6px;
-  padding:6px;
-  display:none;
-}
-
-.switch {
-  position: relative;
-  width: 52px;
-  height: 26px;
-}
-
-.switch input { display:none; }
-
-.slider {
-  position:absolute;
-  inset:0;
-  background:#4caf50;
-  border-radius:26px;
-  transition:.3s;
-}
-
-.slider:before {
-  position:absolute;
-  content:"";
-  height:20px;
-  width:20px;
-  left:3px;
-  bottom:3px;
-  background:white;
-  border-radius:50%;
-  transition:.3s;
-}
-
-input:checked + .slider {
-  background:#d32f2f;
-}
-
-input:checked + .slider:before {
-  transform: translateX(26px);
-}
-
-button {
-  width:100%;
-  padding:14px;
-  font-size:16px;
-  border:none;
-  border-radius:6px;
-  background:#0078d4;
-  color:#fff;
-}
+body{font-family:Arial,sans-serif;background:#f4f4f4;padding:15px}
+.hidden{display:none}
+.section{background:#fff;padding:12px;margin-bottom:15px;border-radius:6px}
+.item{display:flex;justify-content:space-between;align-items:center;margin:10px 0}
+.item-label{font-weight:bold;flex:1}
+.toggle-wrapper{display:flex;align-items:center;gap:8px}
+.ok-text{color:#2e7d32;font-weight:bold}
+.nok-text{color:#c62828;font-weight:bold}
+textarea{width:100%;margin-top:6px;padding:6px;display:none}
+.switch{position:relative;width:52px;height:26px}
+.switch input{display:none}
+.slider{position:absolute;inset:0;background:#4caf50;border-radius:26px;transition:.3s}
+.slider:before{content:"";position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+input:checked + .slider{background:#d32f2f}
+input:checked + .slider:before{transform:translateX(26px)}
+button{width:100%;padding:14px;font-size:16px;border:none;border-radius:6px;background:#0078d4;color:#fff}
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
 <div id="loginBox" class="section">
-  <h1>Login</h1>
+  <h2>Login</h2>
   <input id="user" placeholder="Utilizador"><br><br>
   <input id="pass" type="password" placeholder="Password"><br><br>
   <button onclick="login()">Entrar</button>
 </div>
 
-<!-- FORM -->
 <div id="formBox" class="hidden">
 <h1>Inspeção de Manutenção – Quartos</h1>
 
 <form action="https://api.web3forms.com/submit" method="POST" onsubmit="return prepararEnvio();">
-  <input type="hidden" name="access_key" value="6ccbebc1-4c92-4054-b56e-cc65b49ed8ec">
-  <input type="hidden" name="subject" value="INSPECAO_DIARIA">
-  <input type="hidden" name="message" id="finalMessage">
-  <input type="hidden" name="redirect" value="https://p3dru1988.github.io/inspecao-quartos/obrigado.html">
+<input type="hidden" name="access_key" value="6ccbebc1-4c92-4054-b56e-cc65b49ed8ec">
+<input type="hidden" name="subject" value="INSPECAO_DIARIA">
+<input type="hidden" name="message" id="finalMessage">
+<input type="hidden" name="redirect" value="https://p3dru1988.github.io/inspecao-quartos/obrigado.html">
 
-  <div class="section">
-    <label><strong>Quarto nº</strong></label>
-    <input type="number" id="quarto" style="width:100%;padding:8px;">
-  </div>
+<div class="section">
+<label><strong>Quarto nº</strong></label>
+<input type="number" id="quarto" style="width:100%;padding:8px">
+</div>
 
-  <div id="checklist"></div>
+<div id="checklist"></div>
 
-  <button type="submit">Submeter inspeção</button>
+<button type="submit">Submeter inspeção</button>
 </form>
 </div>
 
 <script>
-/* sessão */
-if (sessionStorage.getItem("auth") === "ok") {
+if(sessionStorage.getItem("auth")==="ok"){
   loginBox.style.display="none";
   formBox.classList.remove("hidden");
 }
@@ -155,43 +68,14 @@ function login(){
   } else alert("Credenciais inválidas");
 }
 
-/* checklist */
-const checklistData = {
+const checklistData={
   "Portas e Acessos":[
     "Portas abrem/fecham corretamente e sem ruídos",
     "Bateria da fechadura eletrónica",
     "Leitor de cartões funcional",
-    "Molas hidráulicas bem afinadas (sem bater a porta)",
+    "Molas hidráulicas bem afinadas",
     "Fecho/tranca porta principal funcional",
     "Batentes/limitadores e dobradiças sem folgas"
-  ],
-  "Eletricidade":[
-    "Iluminação geral","Candeeiros","Interruptores","Tomadas","Tomadas USB",
-    "Estado dos cabos e arrumados",
-    "Quadros elétricos bem fixos",
-    "Sensores de movimento dos roupeiros"
-  ],
-  "Climatização":[
-    "Ar condicionado funcional e sem ruídos",
-    "Grelhas de ar limpas",
-    "Extração do WC funcional"
-  ],
-  "WC":[
-    "Sanita","Autoclismo","Duche com pressão adequada","Duche de mão",
-    "Misturadoras","Ralos","Tampa sanita",
-    "Iluminação espelho","Massa de juntas"
-  ],
-  "Equipamentos":[
-    "TV + Coluna WC","Comando TV","Telefone","Cofre","Mini-bar","Wi-Fi"
-  ],
-  "Estrutura / Acabamentos":[
-    "Indícios de humidade","Suportes amenities","Suportes gerais",
-    "Pintura","Papel de parede","Cabeceira",
-    "Cadeiras","Abat-jours","Janelas",
-    "Silicones","Mobiliário","Autocolantes"
-  ],
-  "Segurança":[
-    "Detetor de fumo","Planta de emergência"
   ]
 };
 
@@ -204,7 +88,7 @@ for(const sec in checklistData){
     idx++;
     s.innerHTML+=`
     <div class="item">
-      <label class="item-label">${item}</label>
+      <span class="item-label">${item}</span>
       <div class="toggle-wrapper">
         <span class="ok-text">OK</span>
         <label class="switch">
@@ -221,24 +105,37 @@ for(const sec in checklistData){
 
 function toggleObs(i){
   document.getElementById("o"+i).style.display =
-    document.getElementById("i"+i).checked ? "block" : "none";
+    document.getElementById("i"+i).checked ? "block":"none";
 }
 
 function prepararEnvio(){
-  if(!quarto.value){ quarto.focus(); return false; }
+  if(!quarto.value){
+    quarto.focus();
+    return false;
+  }
 
   let msg=`DATA: ${new Date().toLocaleDateString("pt-PT")}\nQUARTO: ${quarto.value}\n\n`;
+  let primeiroErro=null;
   let temNok=false;
 
   for(let i=1;i<=idx;i++){
     const chk=document.getElementById("i"+i);
     if(chk.checked){
-      const obs=document.getElementById("o"+i);
-      if(!obs.value){ obs.focus(); return false; }
       temNok=true;
-      const texto=chk.closest(".item").querySelector(".item-label").innerText;
-      msg+=`NOK: ${texto}\nOBS: ${obs.value}\n\n`;
+      const obs=document.getElementById("o"+i);
+      if(!obs.value && !primeiroErro){
+        primeiroErro=obs;
+      }
+      if(obs.value){
+        const texto=chk.closest(".item").querySelector(".item-label").innerText;
+        msg+=`NOK: ${texto}\nOBS: ${obs.value}\n\n`;
+      }
     }
+  }
+
+  if(primeiroErro){
+    primeiroErro.focus();
+    return false;
   }
 
   if(!temNok){
