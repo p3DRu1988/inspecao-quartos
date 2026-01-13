@@ -35,17 +35,43 @@ function toggleObs(id,nok){document.getElementById(id+"_obs").style.display=nok?
 
 /* SUBMISSÃO */
 function prepararEnvio(){
-  let txt="",tem=false;
-  document.querySelectorAll(".item").forEach(i=>{
-    const nok=i.querySelector(".nok"), obs=i.querySelector("textarea");
-    if(nok.checked){
-      if(obs.value.trim()===""){alert("Observação obrigatória nos NOK.");throw"";}
-      tem=true;
-      txt+="- "+nok.dataset.desc+"\n  Obs: "+obs.value+"\n\n";
+  let txt = "";
+  let temNOK = false;
+
+  const itens = document.querySelectorAll(".item");
+
+  for (const i of itens) {
+    const ok = i.querySelector("input[type=radio]:first-child");
+    const nok = i.querySelector(".nok");
+    const obs = i.querySelector("textarea");
+
+    if (!ok.checked && !nok.checked) {
+      alert("Todos os itens devem ser marcados como OK ou NOK.");
+      return false;
     }
-  });
-  if(!tem){alert("Inspeção sem anomalias.");throw"";}
-  mensagem.value="Data: "+data.value+"\nQuarto: "+quarto.value+"\n\nNOK:\n"+txt;
+
+    if (nok.checked) {
+      if (obs.value.trim() === "") {
+        alert("Observação obrigatória nos itens NOK.");
+        obs.focus();
+        return false;
+      }
+      temNOK = true;
+      txt += "- " + nok.dataset.desc + "\n  Obs: " + obs.value + "\n\n";
+    }
+  }
+
+  if (!temNOK) {
+    alert("Inspeção sem anomalias. Nada a enviar.");
+    return false;
+  }
+
+  mensagem.value =
+    "Data: " + data.value +
+    "\nQuarto: " + quarto.value +
+    "\n\nNOK:\n" + txt;
+
+  return true; // ✅ só aqui é que deixa enviar
 }
 </script>
 </head>
