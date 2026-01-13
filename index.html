@@ -16,99 +16,122 @@ button { width:100%; padding:12px; font-size:16px; background:#0078d4; color:#ff
 </style>
 
 <script>
-/* LOGIN SIMPLES */
+/* LOGIN */
 function login() {
-  const u = document.getElementById("user").value;
-  const p = document.getElementById("pass").value;
-  if (u === "pedro" && p === "mnt") {
-    document.getElementById("login").style.display="none";
-    document.getElementById("form").style.display="block";
-  } else {
-    alert("Credenciais inválidas.");
-  }
+  if (user.value==="pedro" && pass.value==="mnt") {
+    loginBox.style.display="none";
+    formBox.style.display="block";
+  } else alert("Credenciais inválidas.");
 }
 
 /* DATA AUTOMÁTICA */
-window.onload = function() {
-  const d = new Date();
-  document.getElementById("data").value =
-    d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+window.onload = () => {
+  const d=new Date();
+  data.value = d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
 
-/* MOSTRAR OBS APENAS NOK */
-function toggleObs(id, nok) {
-  document.getElementById(id+"_obs").style.display = nok ? "block" : "none";
-}
+/* OBS NOK */
+function toggleObs(id,nok){document.getElementById(id+"_obs").style.display=nok?"block":"none";}
 
-/* SUBMISSÃO – APENAS NOK */
-function prepararEnvio() {
-  let corpo = "";
-  let existeNOK = false;
-
-  document.querySelectorAll(".item").forEach(i => {
-    const nok = i.querySelector(".nok");
-    const obs = i.querySelector("textarea");
-
-    if (nok.checked) {
-      if (obs.value.trim()==="") {
-        alert("Observação obrigatória nos NOK.");
-        throw "Erro";
-      }
-      existeNOK = true;
-      corpo += "- " + nok.dataset.desc + "\n  Obs: " + obs.value + "\n\n";
+/* SUBMISSÃO */
+function prepararEnvio(){
+  let txt="",tem=false;
+  document.querySelectorAll(".item").forEach(i=>{
+    const nok=i.querySelector(".nok"), obs=i.querySelector("textarea");
+    if(nok.checked){
+      if(obs.value.trim()===""){alert("Observação obrigatória nos NOK.");throw"";}
+      tem=true;
+      txt+="- "+nok.dataset.desc+"\n  Obs: "+obs.value+"\n\n";
     }
   });
-
-  if (!existeNOK) {
-    alert("Inspeção sem anomalias.");
-    throw "Sem NOK";
-  }
-
-  document.getElementById("mensagem").value =
-    "Data: " + document.getElementById("data").value +
-    "\nQuarto: " + document.getElementById("quarto").value +
-    "\n\nNOK:\n" + corpo;
+  if(!tem){alert("Inspeção sem anomalias.");throw"";}
+  mensagem.value="Data: "+data.value+"\nQuarto: "+quarto.value+"\n\nNOK:\n"+txt;
 }
 </script>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="login" class="section">
+<div id="loginBox" class="section">
 <h2>Acesso</h2>
 <input id="user" placeholder="Utilizador"><br><br>
 <input id="pass" type="password" placeholder="Password"><br><br>
 <button onclick="login()">Entrar</button>
 </div>
 
-<!-- FORM -->
-<div id="form" class="hidden">
+<div id="formBox" class="hidden">
 <h1>Inspeção de Manutenção – Quartos</h1>
 
 <form action="https://api.web3forms.com/submit" method="POST" onsubmit="prepararEnvio()">
-<input type="hidden" name="access_key" value="SEU_ACCESS_KEY_AQUI">
+<input type="hidden" name="access_key" value="6ccbebc1-4c92-4054-b56e-cc65b49ed8ec">
 <input type="hidden" name="message" id="mensagem">
-<input type="hidden" id="data" name="data">
+<input type="hidden" id="data">
 
 <div class="section">
 <label>Quarto nº</label><br>
 <input type="number" id="quarto" required style="width:100%">
 </div>
 
-<!-- EXEMPLO ITEM (modelo usado em todos) -->
-<div class="section">
-<h2>Portas e Acessos</h2>
+<script>
+const checklist = {
+"Portas e Acessos":[
+"Portas abrem/fecham corretamente e sem ruídos",
+"Bateria da fechadura eletrónica",
+"Leitor de cartões funcional",
+"Molas hidráulicas bem afinadas (sem bater a porta)",
+"Fecho/tranca porta principal funcional",
+"Batentes/limitadores e dobradiças sem folgas"
+],
+"Eletricidade":[
+"Iluminação geral","Candeeiros","Interruptores","Tomadas","Tomadas USB",
+"Estado dos cabos e arrumados (com abraçadeira)",
+"Quadros / tampas elétricas bem fixas e fechados",
+"Sensores de movimento dos roupeiros"
+],
+"Climatização":[
+"Ar condicionado funcional e sem ruídos de ventilação",
+"Grelhas de ar desobstruídas / limpas",
+"Extração do WC funcional e sem barulho"
+],
+"WC":[
+"Sanita desentupida","Autoclismo funcional sem fugas",
+"Duche com pressão adequada","Estado do duche de mão",
+"Misturadoras funcionais e sem folgas","Todos os ralos com escoamento normal",
+"Tampa sanita","Iluminação do espelho de proximidade",
+"Massa de juntas (falta de massa)"
+],
+"Equipamentos":[
+"TV + Coluna WC","Comando TV funcional","Telefone",
+"Cofre funcional","Mini-bar funcional","Wi-Fi"
+],
+"Estrutura / Acabamentos":[
+"Indícios de humidade","Suportes de amenities",
+"Suportes (toalhas, cabides, etc.)","Pintura geral",
+"Papel de parede","Cabeceira de cama",
+"Cadeiras / Cadeirões","Abat-jours","Janelas",
+"Silicones gerais","Mobiliário","Autocolantes WC + Interruptores"
+],
+"Segurança":[
+"Detetor de fumo funcional","Planta de emergência bem afixada"
+]
+};
 
-<div class="item">
-<label>Batentes/limitadores e dobradiças sem folgas</label><br>
-<input type="radio" name="p1" onclick="toggleObs('p1',false)"> OK
-<input type="radio" name="p1" class="nok" data-desc="Batentes/limitadores e dobradiças sem folgas" onclick="toggleObs('p1',true)"> NOK
-<textarea id="p1_obs" class="obs" placeholder="Observações"></textarea>
-</div>
-
-<!-- REPETIR ESTE BLOCO PARA TODOS OS ITENS DA LISTA -->
-</div>
+let id=1;
+for (const sec in checklist){
+  document.write('<div class="section"><h2>'+sec+'</h2>');
+  checklist[sec].forEach(t=>{
+    document.write(`
+    <div class="item">
+      <label>${t}</label><br>
+      <input type="radio" name="i${id}" onclick="toggleObs('i${id}',false)"> OK
+      <input type="radio" name="i${id}" class="nok" data-desc="${t}" onclick="toggleObs('i${id}',true)"> NOK
+      <textarea id="i${id}_obs" class="obs" placeholder="Observações"></textarea>
+    </div>`);
+    id++;
+  });
+  document.write('</div>');
+}
+</script>
 
 <button type="submit">Submeter inspeção</button>
 </form>
