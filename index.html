@@ -10,10 +10,62 @@ body { font-family: Arial, sans-serif; background:#f4f4f4; padding:15px; }
 h1,h2 { margin-top:0; }
 .section { background:#fff; padding:15px; margin-bottom:15px; border-radius:6px; }
 .item { margin-bottom:14px; }
-label { font-weight:bold; display:block; }
+label { font-weight:bold; display:block; margin-bottom:6px; }
 .obs { display:none; width:100%; margin-top:6px; }
-button { background:#0078d4; color:#fff; padding:14px; width:100%; border:none; border-radius:6px; font-size:16px; }
+
+/* BOTÃO */
+button {
+  background:#0078d4; color:#fff; padding:14px;
+  width:100%; border:none; border-radius:6px; font-size:16px;
+}
+
 .hidden { display:none; }
+
+/* INTERRUPTOR */
+.switch-container {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.ok-label { color:#2e7d32; font-weight:bold; }
+.nok-label { color:#c62828; font-weight:bold; }
+
+.switch {
+  position:relative;
+  width:52px;
+  height:26px;
+}
+
+.switch input {
+  opacity:0; width:0; height:0;
+}
+
+.slider {
+  position:absolute;
+  inset:0;
+  background:#4caf50;
+  border-radius:26px;
+  transition:.3s;
+}
+
+.slider:before {
+  content:"";
+  position:absolute;
+  height:20px; width:20px;
+  left:3px; bottom:3px;
+  background:white;
+  border-radius:50%;
+  transition:.3s;
+}
+
+.switch input:checked + .slider {
+  background:#d32f2f;
+}
+
+.switch input:checked + .slider:before {
+  transform:translateX(26px);
+}
 </style>
 
 <script>
@@ -27,9 +79,9 @@ function login() {
   }
 }
 
-/* OBS NOK */
-function toggleObs(id, nok) {
-  document.getElementById(id+"_obs").style.display = nok ? "block" : "none";
+/* TOGGLE */
+function toggleSwitch(el, id) {
+  document.getElementById(id+"_obs").style.display = el.checked ? "block" : "none";
 }
 
 /* SUBMISSÃO */
@@ -46,26 +98,19 @@ function prepararEnvio() {
   let temNOK = false;
 
   for (const item of document.querySelectorAll(".item")) {
-    const ok = item.querySelector(".ok");
-    const nok = item.querySelector(".nok");
+    const sw = item.querySelector(".nok-switch");
     const obs = item.querySelector("textarea");
 
-    if (!ok.checked && !nok.checked) {
-      alert("Todos os itens devem ser marcados como OK ou NOK.");
-      item.scrollIntoView({behavior:"smooth", block:"center"});
-      return false;
-    }
-
-    if (nok.checked) {
+    if (sw.checked) {
       if (!obs.value.trim()) {
         alert("Observação obrigatória nos itens NOK.");
-        obs.style.display = "block";
+        obs.style.display="block";
         obs.scrollIntoView({behavior:"smooth", block:"center"});
         setTimeout(()=>obs.focus(),300);
         return false;
       }
       temNOK = true;
-      texto += `- ${nok.dataset.desc}\n  Obs.: ${obs.value}\n\n`;
+      texto += `- ${sw.dataset.desc}\n  Obs.: ${obs.value}\n\n`;
     }
   }
 
@@ -95,7 +140,6 @@ function prepararEnvio() {
 <h1>Inspeção de Manutenção – Quartos</h1>
 
 <form action="https://api.web3forms.com/submit" method="POST" onsubmit="return prepararEnvio();">
-
 <input type="hidden" name="access_key" value="6ccbebc1-4c92-4054-b56e-cc65b49ed8ec">
 <input type="hidden" name="subject" value="INSPECAO_DIARIA">
 <input type="hidden" name="message" id="finalMessage">
@@ -156,8 +200,14 @@ for (const sec in checklist) {
     document.write(`
     <div class="item">
       <label>${t}</label>
-      <input type="radio" class="ok"> OK
-      <input type="radio" class="nok" data-desc="${t}" onclick="toggleObs('i${id}',true)"> NOK
+      <div class="switch-container">
+        <span class="ok-label">OK</span>
+        <label class="switch">
+          <input type="checkbox" class="nok-switch" data-desc="${t}" onchange="toggleSwitch(this,'i${id}')">
+          <span class="slider"></span>
+        </label>
+        <span class="nok-label">NOK</span>
+      </div>
       <textarea id="i${id}_obs" class="obs" placeholder="Observações"></textarea>
     </div>`);
     id++;
@@ -172,3 +222,4 @@ for (const sec in checklist) {
 
 </body>
 </html>
+
